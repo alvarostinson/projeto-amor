@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uma pergunta importante ❤️</title>
+
+    <style>
+        h2 {
+
+            color: #555;
+            font-size: 15px;
+            font-style: italic;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            padding: 15px;
+        }
+
+        /* CONTAINER */
+        .container {
+            text-align: center;
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 420px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* TEXTO */
+        h1 {
+            margin-bottom: 15px;
+            font-size: clamp(20px, 5vw, 28px);
+        }
+
+        #contador {
+            margin-bottom: 20px;
+            color: #555;
+            font-size: clamp(14px, 3.5vw, 16px);
+        }
+
+        /* BOTÕES */
+        .botoes {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: clamp(14px, 4vw, 16px);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        /* SIM */
+        #sim {
+            background-color: #ff4d6d;
+            color: white;
+            z-index: 2;
+        }
+
+        #sim:hover {
+            transform: scale(1.1);
+        }
+
+        /* NÃO */
+        #nao {
+            background-color: #999;
+            color: white;
+            transition: left 0.2s cubic-bezier(.68, -0.55, .27, 1.55),
+                top 0.2s cubic-bezier(.68, -0.55, .27, 1.55),
+                transform 0.15s;
+        }
+
+        /* efeito quando foge */
+        #nao.fugindo {
+            transform: scale(1.1);
+        }
+
+        /* FULLSCREEN */
+        #fullscreen {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+            background: transparent;
+            color: #555;
+        }
+
+        /* CORAÇÕES */
+        .heart {
+            position: fixed;
+            top: -10px;
+            font-size: 20px;
+            animation: fall linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+            }
+        }
+
+        /* RESPONSIVO EXTRA */
+        @media (max-width: 400px) {
+            .container {
+                padding: 20px;
+            }
+
+            .botoes {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+
+
+        .galeria {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .galeria img {
+            width: 30%;
+            max-width: 120px;
+            border-radius: 10px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: aparecer 0.8s ease forwards;
+        }
+
+        .galeria img:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .galeria img:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes aparecer {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* MOBILE */
+        @media (max-width: 400px) {
+            .galeria img {
+                width: 80%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Você é a namorada mais linda do mundo?❤️</h1>
+        <h2>A mulher mais incrível de todas❤️</h2>
+        <div id="contador"></div>
+
+        <div class="botoes">
+            <button id="sim" onclick="aceitou()">Sim 💖</button>
+
+            <div id="placeholder-nao">
+                <button id="nao">Não 😢</button>
+            </div>
+        </div>
+
+        <button id="fullscreen" onclick="abrirTelaCheia()">Tela cheia</button>
+    </div>
+
+    <audio id="musica" src="musica.mp3" preload="auto"></audio>
+
+    <script>
+        const naoBtn = document.getElementById("nao");
+        const placeholder = document.getElementById("placeholder-nao");
+
+        let modoFuga = false;
+
+        setTimeout(() => {
+            const rect = naoBtn.getBoundingClientRect();
+
+            // mantém espaço no layout
+            placeholder.style.width = rect.width + "px";
+            placeholder.style.height = rect.height + "px";
+
+            // tira botão do fluxo
+            naoBtn.style.position = "fixed";
+            naoBtn.style.left = rect.left + "px";
+            naoBtn.style.top = rect.top + "px";
+
+            modoFuga = true;
+        }, 1000);
+
+        // ===== TELEPORTE LONGE DO MOUSE =====
+        document.addEventListener("mousemove", (e) => {
+            if (!modoFuga) return;
+
+            const rect = naoBtn.getBoundingClientRect();
+
+            const distancia = Math.sqrt(
+                (e.clientX - (rect.left + rect.width / 2)) ** 2 +
+                (e.clientY - (rect.top + rect.height / 2)) ** 2
+            );
+
+            if (distancia < 150) {
+
+                let novoX, novoY;
+                let tentativa = 0;
+
+                do {
+                    const largura = window.innerWidth - naoBtn.offsetWidth;
+                    const altura = window.innerHeight - naoBtn.offsetHeight;
+
+                    novoX = Math.random() * largura;
+                    novoY = Math.random() * altura;
+
+                    tentativa++;
+                    if (tentativa > 100) break;
+
+                } while (
+                    Math.sqrt(
+                        (e.clientX - novoX) ** 2 +
+                        (e.clientY - novoY) ** 2
+                    ) < 150
+                );
+
+                naoBtn.style.left = novoX + "px";
+                naoBtn.style.top = novoY + "px";
+            }
+        });
+
+        document.addEventListener("touchstart", (e) => {
+            if (!modoFuga) return;
+
+            const toque = e.touches[0];
+
+            const rect = naoBtn.getBoundingClientRect();
+
+            const distancia = Math.sqrt(
+                (toque.clientX - (rect.left + rect.width / 2)) ** 2 +
+                (toque.clientY - (rect.top + rect.height / 2)) ** 2
+            );
+
+            if (distancia < 150) {
+
+                let novoX, novoY;
+
+                const largura = window.innerWidth - naoBtn.offsetWidth;
+                const altura = window.innerHeight - naoBtn.offsetHeight;
+
+                novoX = Math.random() * largura;
+                novoY = Math.random() * altura;
+
+                naoBtn.classList.add("fugindo");
+
+                setTimeout(() => {
+                    naoBtn.classList.remove("fugindo");
+                }, 150);
+
+                naoBtn.style.left = novoX + "px";
+                naoBtn.style.top = novoY + "px";
+            }
+        });
+
+        // ===== CONTADOR =====
+        const dataInicio = new Date("2026-03-01");
+
+        function atualizarContador() {
+            const agora = new Date();
+            const diff = agora - dataInicio;
+
+            const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutos = Math.floor((diff / (1000 * 60)) % 60);
+
+            document.getElementById("contador").innerText =
+                `Estamos juntos há ${dias} dias, ${horas} horas e ${minutos} minutos ❤️`;
+        }
+
+        setInterval(atualizarContador, 1000);
+        atualizarContador();
+
+        function abrirTelaCheia() {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            }
+        }
+
+        function aceitou() {
+            const musica = document.getElementById("musica");
+            document.getElementById("musica").play();
+            musica.volume = 0.3; // 30% de volume (recomendado)
+            musica.play();
+
+            document.querySelector(".container").innerHTML = `...`;
+
+            criarCoracoes();
+
+            document.querySelector(".container").innerHTML = `
+  <div style="display:flex;justify-content:center;align-items:center;height:100%;flex-direction:column;text-align:center;padding:20px;">
+    
+    <h1>Eu sabia!! ❤️😍</h1>
+    <p>💖Você é a melhor coisa que já aconteceu na minha vida 💖 <br><br>💖Eu Te Amo Viviany💖</p>
+
+    <div class="galeria">
+      <img src="foto1.jpeg">
+      <img src="foto2.jpeg">
+      <img src="foto3.jpeg">
+    </div>
+
+  </div>
+`;
+
+            criarCoracoes();
+        }
+
+
+        function criarCoracoes() {
+            setInterval(() => {
+                const heart = document.createElement("div");
+                heart.classList.add("heart");
+                heart.innerText = "❤️";
+
+                heart.style.left = Math.random() * 100 + "vw";
+                heart.style.animationDuration = (Math.random() * 3 + 2) + "s";
+
+                document.body.appendChild(heart);
+
+                setTimeout(() => heart.remove(), 5000);
+            }, 200);
+        }
+    </script>
+
+</body>
+
+</html>
